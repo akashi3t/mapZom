@@ -45,7 +45,7 @@ function toggleSidebar() {
   var sidebar = document.getElementById('sidebar');
   var from = sidebarHidden ? 0 : -400;
   var to = sidebarHidden ? -400 : 0;
-  TinyAnimate.animateCSS(sidebar, 'left', 'px', from, to, 500, 'easeInOutQuart',
+  TinyAnimate.animateCSS(sidebar, 'left', 'px', from, to, 400, 'easeInOutQuart',
     function () {
       sidebarHide.innerHTML = sidebarHidden ? '&gt;' : '&lt;';
       if (sidebarHidden && !selectedRes) {
@@ -87,6 +87,7 @@ function getRestaurants(place) {
       var data;
       try {
         data = JSON.parse(xmlhttp.responseText);
+        console.log(data);
       } catch (err) {
         console.error(err);
         return;
@@ -135,7 +136,7 @@ function openInfoWindow(res, marker) {
   infowindow = new google.maps.InfoWindow({
     content: ratingSpan +
       '<span class="info-heading">' + res.name + '</span><br/>' +
-      'Cusisines: ' + res.cuisines + '<br/>' +
+      'cuisines: ' + res.cuisines + '<br/>' +
       'Average Cost For Two: ' +
         '<b>' + res.currency + ' ' + res.average_cost_for_two + '</b>'
   });
@@ -148,12 +149,22 @@ function openSidebar(res) {
   var img = document.getElementById('sel-res-img');
   var title = document.getElementById('title');
   var price = document.getElementById('price');
+  var cuisines = document.getElementById('cuisines');
+  var onlineDelivey = document.getElementById('online-delivey');
+  var deliveryNow = document.getElementById('delivery-now');
+  var imgRating = document.getElementById('img-rating');
+
   if (sidebarHidden) {
-    toggleSidebar();
+    toggleSidebar(); 
   }
   img.src = res.thumb || 'img/no-image-found.png';
   title.innerHTML = res.name;
-  price.innerHTML = res.average_cost_for_two;
+  price.innerHTML = res.currency + ' ' + res.average_cost_for_two;
+  cuisines.innerHTML = res.cuisines;
+  onlineDelivey.innerHTML = res.has_online_delivery ? 'Yes' : 'No';
+  deliveryNow.innerHTML = res.is_delivering_now ? 'Yes' : 'No';
+  imgRating.innerHTML = res.user_rating.aggregate_rating;
+  imgRating.style.backgroundColor = '#' + res.user_rating.rating_color;
 }
 
 function removeMarkers() {
