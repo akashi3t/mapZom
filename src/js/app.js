@@ -11,19 +11,31 @@ var selectedRes;
 var sidebarHide;
 var loader;
 var reviews;
+var place = {
+  lat: 0,
+  lng: 0
+};
+var currentUserLocation;
 
-function initMap() {
+function init() {
   sidebarHide = document.getElementById('sidebar-hide');
   loader = document.getElementById('loader');
   reviews = document.getElementById('reviews-placeholder');
+  setCurrentLocation(function (Geoposition) {
+    place.lat = Geoposition.coords.latitude;
+    place.lng = Geoposition.coords.longitude;
+    currentUserLocation = Object.assign({}, place);
 
-  var btm = {
-    lat: 12.9135919,
-    lng: 77.6122421
-  };
+    drawMap();
+  }, function (err) {
+    drawMap();
+  });
+}
+
+function drawMap(next) {
   map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 17,
-    center: btm
+    zoom: currentUserLocation ? 17 : 2,
+    center: place
   });
   map.addListener('click',
     function () {
@@ -40,6 +52,18 @@ function initMap() {
   autocomplete = new google.maps.places.Autocomplete(input);
   autocomplete.bindTo('bounds', map);
   autocomplete.addListener('place_changed', placeChanged);
+
+  if (place)
+    getRestaurants(place);
+}
+
+function setCurrentLocation(successHandler, errHandler) {
+  if (navigator.geolocation) {
+    return navigator.geolocation.getCurrentPosition(
+      successHandler, errHandler, {timeout: 5000}
+    );
+  }
+  return next();
 }
 
 function toggleSidebar() {
@@ -80,11 +104,17 @@ function placeChanged() {
 }
 
 function getRestaurants(place) {
-  if (!place.geometry) return;
+  var lat, lng;
+  
+  if (!place.geometry) {
+    lat = place.lat;
+    lng = place.lng;
+  } else {
+    lat = place.geometry.location.lat();
+    lng = place.geometry.location.lng();
+  }
 
-  var lat = place.geometry.location.lat();
-  var lon = place.geometry.location.lng();
-  var url = zomatoAPI + '/search?lat=' + lat + '&lon=' + lon;
+  var url = zomatoAPI + '/search?lat=' + lat + '&lon=' + lng;
   get(url, function (err, data) {
     if (err) return;
 

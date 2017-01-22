@@ -11,6 +11,7 @@
   width: 400px;
   background-color: white;
   z-index: 1;
+  left: -400px;
 }
 #sidebar-hide{
   height: 60px;
