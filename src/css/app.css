@@ -1,5 +1,4 @@
 *{
-  border: 0;
   margin: 0;
 }
 #map{
@@ -10,7 +9,7 @@
   position: absolute;
   height: 100vh;
   width: 400px;
-  background-color: wheat;
+  background-color: white;
   z-index: 1;
 }
 #sidebar-hide{
@@ -56,13 +55,41 @@
   margin-right: 4px;
 }
 #img-rating{
-  width: 40px;
-  height: 40px;
+  width: 20px;
+  height: 20px;
   z-index: 1;
   position: absolute;
   right: 6px;
   bottom: 6px;
+  padding: 10px;
 }
 .sidebar-description{
   padding:3%;
+  overflow-y: auto;
+}
+.layout.vertical{
+  display: flex;
+  flex-direction: column;
+}
+.flex{
+  flex: 1
+}
+.review > img {
+  height: 50px;
+  border-radius: 50%;
+  float: left;
+  margin-right: 20px;
+}
+.review > .comment{
+  clear: both;
+  font-size: 12px;
+}
+.review h4{
+  color: darkCyan;
+}
+.review h4+p{
+  margin-top: 4px;
+}
+#loader{
+  display: none;
 }

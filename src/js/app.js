@@ -9,9 +9,14 @@ var markers = [];
 var infowindow;
 var selectedRes;
 var sidebarHide;
+var loader;
+var reviews;
 
 function initMap() {
   sidebarHide = document.getElementById('sidebar-hide');
+  loader = document.getElementById('loader');
+  reviews = document.getElementById('reviews-placeholder');
+
   var btm = {
     lat: 12.9135919,
     lng: 77.6122421
@@ -68,7 +73,6 @@ function placeChanged() {
     return;
   }
 
-
   map.setCenter(place.geometry.location);
   map.setZoom(17); // Why 17? Because it looks good.
 
@@ -80,25 +84,13 @@ function getRestaurants(place) {
 
   var lat = place.geometry.location.lat();
   var lon = place.geometry.location.lng();
-  var xmlhttp = new XMLHttpRequest();
-  xmlhttp.onreadystatechange = function () {
-    if (xmlhttp.readyState === XMLHttpRequest.DONE
-      && xmlhttp.status === 200) {
-      var data;
-      try {
-        data = JSON.parse(xmlhttp.responseText);
-        console.log(data);
-      } catch (err) {
-        console.error(err);
-        return;
-      }
-      removeMarkers();
-      showRestaurantMarkers(data.restaurants);
-    }
-  };
+  var url = zomatoAPI + '/search?lat=' + lat + '&lon=' + lon;
+  get(url, function (err, data) {
+    if (err) return;
 
-  xmlhttp.open('GET', zomatoAPI + '/search?lat=' + lat + '&lon=' + lon, true);
-  xmlhttp.send();
+    removeMarkers();
+    showRestaurantMarkers(data.restaurants);
+  });
 }
 
 function showRestaurantMarkers(restaurants) {
@@ -119,7 +111,10 @@ function showRestaurantMarkers(restaurants) {
         position: position
       });
       marker.addListener('mouseover', openInfoWindow.bind(null, res, marker));
-      marker.addListener('click', openSidebar.bind(null, res));
+      marker.addListener('click', function () {
+        openSidebar(res);
+        getReviews(res);
+      });
       markers.push(marker);
     }
   );
@@ -157,7 +152,7 @@ function openSidebar(res) {
   if (sidebarHidden) {
     toggleSidebar(); 
   }
-  img.src = res.thumb || 'img/no-image-found.png';
+  img.src = res.thumb || 'img/no-image-found.jpg';
   title.innerHTML = res.name;
   price.innerHTML = res.currency + ' ' + res.average_cost_for_two;
   cuisines.innerHTML = res.cuisines;
@@ -165,6 +160,47 @@ function openSidebar(res) {
   deliveryNow.innerHTML = res.is_delivering_now ? 'Yes' : 'No';
   imgRating.innerHTML = res.user_rating.aggregate_rating;
   imgRating.style.backgroundColor = '#' + res.user_rating.rating_color;
+}
+
+function getReviews(res) {
+  var url = zomatoAPI + '/reviews?res_id=' + res.R.res_id;
+  reviews.innerHTML = '';
+  loader.style.display = 'block';
+
+  get(url, function (err, data) {
+    loader.style.display = 'none';
+    if (err) return;
+
+    if (data.reviews_count === 0) {
+      reviews.innerHTML = '<p>No Reviews Found!</p>';
+    }
+    data.user_reviews.forEach(function (obj) {
+      var review = obj.review;
+      var reviewDiv = document.createElement('div');
+      var profilePic = document.createElement('img');
+      var name = document.createElement('h4');
+      var ratingPara = document.createElement('p');
+      var rating = document.createElement('span');
+      var comment = document.createElement('p');
+      var hRule = document.createElement('hr');
+      profilePic.src = review.user.profile_image;
+      name.innerHTML = review.user.name;
+      rating.className = 'info-rating';
+      rating.style.backgroundColor = '#' + review.rating_color;
+      rating.innerHTML = review.rating;
+      ratingPara.innerHTML = 'Rated: ';
+      ratingPara.appendChild(rating);
+      comment.className = 'comment';
+      comment.innerHTML = review.review_text;
+      reviewDiv.className = 'review';
+      reviewDiv.appendChild(profilePic);
+      reviewDiv.appendChild(name);
+      reviewDiv.appendChild(ratingPara);
+      reviewDiv.appendChild(comment);
+      reviewDiv.appendChild(hRule);
+      reviews.appendChild(reviewDiv);
+    });
+  });
 }
 
 function removeMarkers() {
@@ -177,7 +213,7 @@ function removeMarkers() {
 }
 
 function imgError(img) {
-  img.src = 'img/no-image-found.png';
+  img.src = 'img/no-image-found.jpg';
 }
 
 XMLHttpRequest.prototype.realSend = XMLHttpRequest.prototype.send;
@@ -186,3 +222,23 @@ var newSend = function (vData) {
   this.realSend(vData);
 };
 XMLHttpRequest.prototype.send = newSend;
+
+function get(url, next) {
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function () {
+    if (xmlhttp.readyState === XMLHttpRequest.DONE
+      && xmlhttp.status === 200) {
+      var data;
+      try {
+        data = JSON.parse(xmlhttp.responseText);
+      } catch (err) {
+        console.error(err);
+        return next(err);
+      }
+      return next(null, data);
+    }
+  };
+
+  xmlhttp.open('GET', url, true);
+  xmlhttp.send();
+}
