@@ -14,13 +14,15 @@
   left: -400px;
 }
 #sidebar-hide{
-  height: 60px;
+  cursor: not-allowed;
+  height: 50px;
   width: 10px;
-  padding: 10px;
-  background-color: gray;
-  position: absolute;
+  top: 40%;
   right: -30px;
+  padding: 20px 13px 0 10px;
+  background-color: gray;
   color: white;
+  position: absolute;
   font-size: 25px;
   font-weight: bolder;
   z-index: 1;
@@ -96,4 +98,13 @@
 }
 #loader{
   display: none;
+}
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari*/
+     -khtml-user-select: none; /* Konqueror */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
 }

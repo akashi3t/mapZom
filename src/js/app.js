@@ -35,7 +35,8 @@ function init() {
 function drawMap(next) {
   map = new google.maps.Map(document.getElementById('map'), {
     zoom: currentUserLocation ? 17 : 2,
-    center: place
+    center: place,
+    clickableIcons: false
   });
   map.addListener('click',
     function () {
@@ -43,6 +44,7 @@ function drawMap(next) {
       selectedRes = null;
       if (sidebarHidden) {
         sidebarHide.style.backgroundColor = 'gray';
+        sidebarHide.style.cursor = 'not-allowed';
       }
     }
   );
@@ -79,6 +81,7 @@ function toggleSidebar() {
       sidebarHide.innerHTML = sidebarHidden ? '&gt;' : '&lt;';
       if (sidebarHidden && !selectedRes) {
         sidebarHide.style.backgroundColor = 'gray';
+        sidebarHide.style.cursor = 'not-allowed'
       }
     }
   );
@@ -105,7 +108,7 @@ function placeChanged() {
 
 function getRestaurants(place) {
   var lat, lng;
-  
+
   if (!place.geometry) {
     lat = place.lat;
     lng = place.lng;
@@ -171,6 +174,7 @@ function openInfoWindow(res, marker) {
 function openSidebar(res) {
   selectedRes = res;
   sidebarHide.style.backgroundColor = 'darkCyan';
+  sidebarHide.style.cursor = 'pointer';
   var img = document.getElementById('sel-res-img');
   var title = document.getElementById('title');
   var price = document.getElementById('price');
