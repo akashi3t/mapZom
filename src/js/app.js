@@ -17,7 +17,7 @@ function initMap() {
     lng: 77.6122421
   };
   map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 14,
+    zoom: 17,
     center: btm
   });
   map.addListener('click',
@@ -65,18 +65,13 @@ function setInitialPostionOfSidebar(show) {
 function placeChanged() {
   var place = autocomplete.getPlace();
   if (!place.geometry) {
-    // User entered the name of a Place that was not suggested and
-    // pressed the Enter key, or the Place Details request failed.
     return;
   }
 
-  // If the place has a geometry, then present it on a map.
-  if (place.geometry.viewport) {
-    map.fitBounds(place.geometry.viewport);
-  } else {
-    map.setCenter(place.geometry.location);
-    map.setZoom(17); // Why 17? Because it looks good.
-  }
+
+  map.setCenter(place.geometry.location);
+  map.setZoom(17); // Why 17? Because it looks good.
+
   getRestaurants(place);
 }
 
@@ -98,7 +93,6 @@ function getRestaurants(place) {
       }
       removeMarkers();
       showRestaurantMarkers(data.restaurants);
-      boundMapOnRestaurants(data.restaurants);
     }
   };
 
@@ -160,30 +154,6 @@ function openSidebar(res) {
   img.src = res.thumb || 'img/no-image-found.png';
   title.innerHTML = res.name;
   price.innerHTML = res.average_cost_for_two;
-}
-
-function boundMapOnRestaurants(restaurants) {
-  if (restaurants.length === 0) return;
-
-  var latlngList = [];
-  restaurants.forEach(
-    function (obj) {
-      var res = obj.restaurant;
-      var lat = parseFloat(res.location.latitude);
-      var lng = parseFloat(res.location.longitude);
-      if (lat === 0 && lng === 0) return;
-
-      latlngList.push(new google.maps.LatLng(lat, lng));
-    }
-  );
-  var bounds = new google.maps.LatLngBounds();
-  latlngList.forEach(
-    function (n) {
-      bounds.extend(n);
-    }
- );
-  map.setCenter(bounds.getCenter());
-  map.fitBounds(bounds);
 }
 
 function removeMarkers() {
