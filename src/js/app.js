@@ -11,16 +11,19 @@ var selectedRes;
 var sidebarHide;
 var loader;
 var reviews;
+var currentUserLocation;
+var bookButton;
 var place = {
   lat: 0,
   lng: 0
 };
-var currentUserLocation;
 
 function init() {
+  bookButton = document.getElementById('book-button');
   sidebarHide = document.getElementById('sidebar-hide');
   loader = document.getElementById('loader');
   reviews = document.getElementById('reviews-placeholder');
+
   setCurrentLocation(function (Geoposition) {
     place.lat = Geoposition.coords.latitude;
     place.lng = Geoposition.coords.longitude;
@@ -194,6 +197,14 @@ function openSidebar(res) {
   deliveryNow.innerHTML = res.is_delivering_now ? 'Yes' : 'No';
   imgRating.innerHTML = res.user_rating.aggregate_rating;
   imgRating.style.backgroundColor = '#' + res.user_rating.rating_color;
+  if (res.has_table_booking === 1) {
+    bookButton.removeAttribute('disabled');
+    bookButton.onclick = function () {
+      window.open(res.book_url,'_blank');
+    };
+  } else {
+    bookButton.setAttribute('disabled', 'disabled');
+  }
 }
 
 function getReviews(res) {
