@@ -87,6 +87,9 @@
 .review h4{
   color: darkCyan;
 }
+.review hr{
+  margin: 10px 0;
+}
 .review h4+p{
   margin-top: 4px;
 }
