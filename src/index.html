@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="css/app.css">
+    <script src="js/TinyAnimate.js"></script>
+    <script src="js/app.js"></script>
+  </head>
+  <body>
+    <input id="location-input" type="text" placeholder="Enter a location">
+    <div id="sidebar">
+      <div id="sidebar-hide" onclick="toggleSidebar()"></div>
+      <div class="sel-res-img-placeholder">
+        <img id="sel-res-img" src="" onerror="imgError(this)">
+      </div>
+      <h1 id="title">Title</h1>
+      Average priec for two: <h4 id="price"></h4>
+    </div>
+    <div id="map"></div>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAv6RT_5HaCvU4SsOzaQXaQnv1xjHhONkg&libraries=places&callback=initMap"
+      async defer></script>
+  </body>
+</html>
